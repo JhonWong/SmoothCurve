@@ -1,0 +1,32 @@
+#ifndef RANDOMPOINTSDATA_H
+#define RANDOMPOINTSDATA_H
+
+#include <QObject>
+#include <QTimer>
+#include <QPointF>
+
+const int MAX_POINT_COUNT = 1000;
+
+class RandomPointsData : public QObject
+{
+    Q_OBJECT
+public:
+    static RandomPointsData& getInstance();
+
+    std::vector<QPointF>& get_pos_list();
+private:
+    explicit RandomPointsData(QObject *parent = nullptr);
+    ~RandomPointsData();
+
+signals:
+    void sigDataChanged();
+
+private slots:
+    void onTimerUpdate();
+
+private:
+    QTimer update_timer_;
+    std::vector<QPointF> pos_list_;
+};
+
+#endif // RANDOMPOINTSDATA_H
