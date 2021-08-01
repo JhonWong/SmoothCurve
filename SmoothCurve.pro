@@ -9,6 +9,7 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         random_points_data.cpp \
+        random_points_view.cpp \
         smoothcurve.cpp
 
 RESOURCES += qml.qrc
@@ -26,4 +27,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     random_points_data.h \
+    random_points_view.h \
     smoothcurve.h

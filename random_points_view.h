@@ -1,14 +1,14 @@
-#ifndef SMOOTHCURVE_H
-#define SMOOTHCURVE_H
+#ifndef RANDOMPOINTSVIEW_H
+#define RANDOMPOINTSVIEW_H
 
 #include <QQuickItem>
 #include <QSGNode>
 
-class SmoothCurve : public QQuickItem
+class RandomPointsView : public QQuickItem
 {
     Q_OBJECT
 public:
-    SmoothCurve();
+    RandomPointsView();
 
     QSGNode* updatePaintNode(QSGNode *old_node, UpdatePaintNodeData *_data) override;
 
@@ -16,4 +16,4 @@ private:
     int old_point_count_;
 };
 
-#endif // SMOOTHCURVE_H
+#endif // RANDOMPOINTSVIEW_H

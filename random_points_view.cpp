@@ -1,10 +1,10 @@
-#include "smoothcurve.h"
+#include "random_points_view.h"
 #include <QSGGeometry>
 #include <QSGGeometryNode>
 #include <QSGFlatColorMaterial>
 #include "random_points_data.h"
 
-SmoothCurve::SmoothCurve()
+RandomPointsView::RandomPointsView()
     :old_point_count_(0)
 {
     setFlag(ItemHasContents, true);
@@ -15,7 +15,7 @@ SmoothCurve::SmoothCurve()
     });
 }
 
-QSGNode *SmoothCurve::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *_data)
+QSGNode *RandomPointsView::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *_data)
 {
     QSGGeometryNode *node = nullptr;
     QSGGeometry *geometry = nullptr;
@@ -23,8 +23,8 @@ QSGNode *SmoothCurve::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *_da
     if (!oldNode) {
         node = new QSGGeometryNode;
         geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), MAX_POINT_COUNT);
-        geometry->setLineWidth(1);
-        geometry->setDrawingMode(QSGGeometry::DrawLineStrip);
+        geometry->setLineWidth(3);
+        geometry->setDrawingMode(QSGGeometry::DrawPoints);
         node->setGeometry(geometry);
         node->setFlag(QSGNode::OwnsGeometry);
 
