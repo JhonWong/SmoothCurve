@@ -25,8 +25,9 @@ private slots:
     void onTimerUpdate();
 
 private:
-    QPointF pos_;
     QTimer update_timer_;
+    std::vector<QPointF> pos_list_;
+    int old_point_count_;
 };
 
 #endif // SMOOTHCURVE_H
