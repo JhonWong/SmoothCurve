@@ -13,7 +13,11 @@ public:
     QSGNode* updatePaintNode(QSGNode *old_node, UpdatePaintNodeData *_data) override;
 
 private:
+    void calculateSmoothPoints();
+
+private:
     int old_point_count_;
+    std::vector<QPointF> smooth_data_list_;
 };
 
 #endif // SMOOTHCURVE_H

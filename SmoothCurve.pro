@@ -28,4 +28,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     random_points_data.h \
     random_points_view.h \
-    smoothcurve.h
+    smoothcurve.h \
+    spline.h
