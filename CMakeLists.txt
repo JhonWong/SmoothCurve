@@ -27,8 +27,8 @@ random_points_data.h
 random_points_data.cpp
 random_points_view.h
 random_points_view.cpp
-smoothcurve.h
-smoothcurve.cpp
+smooth_curve.h
+smooth_curve.cpp
 spline.h
 )
 

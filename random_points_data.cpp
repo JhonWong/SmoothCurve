@@ -1,19 +1,22 @@
 #include "random_points_data.h"
 
-RandomPointsData &RandomPointsData::getInstance()
+const int INCREASE_SPEED = 5;
+const unsigned int UPDATE_INTERVAL = 200;
+
+RandomPointsData& RandomPointsData::getInstance()
 {
     static RandomPointsData data;
     return data;
 }
 
-RandomPointsData::RandomPointsData(QObject *parent) : QObject(parent)
+RandomPointsData::RandomPointsData(QObject* parent) : QObject(parent)
 {
-    srand((unsigned) time(0));
+    srand((unsigned)time(0));
 
     pos_list_.reserve(MAX_POINT_COUNT);
 
-    update_timer_.start(20);
-    connect(&update_timer_,SIGNAL(timeout()),this,SLOT(onTimerUpdate()));
+    update_timer_.start(UPDATE_INTERVAL);
+    connect(&update_timer_, SIGNAL(timeout()), this, SLOT(onTimerUpdate()));
 }
 
 RandomPointsData::~RandomPointsData()
@@ -21,25 +24,28 @@ RandomPointsData::~RandomPointsData()
 
 }
 
-std::vector<QPointF> &RandomPointsData::get_pos_list()
+std::vector<QPointF>& RandomPointsData::get_pos_list()
 {
     return pos_list_;
 }
 
+int current_x_pos = 0;
 void RandomPointsData::onTimerUpdate()
 {
-    if(pos_list_.size() >= MAX_POINT_COUNT)
+    if (pos_list_.size() >= MAX_POINT_COUNT)
     {
         update_timer_.stop();
         return;
     }
 
-    for(int i = 0;i< 20;i++)
+    for (int i = 0; i < INCREASE_SPEED; i++)
     {
-        int x_pos = rand() % 800;
+        auto x_pos = current_x_pos;
+        current_x_pos += 50;
+        //int x_pos = rand() % 800;
         int y_pos = rand() % 800;
 
-        pos_list_.push_back(QPointF(x_pos,y_pos));
+        pos_list_.push_back(QPointF(x_pos, y_pos));
     }
     emit sigDataChanged();
 }

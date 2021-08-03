@@ -1,11 +1,9 @@
-#ifndef RANDOMPOINTSDATA_H
-#define RANDOMPOINTSDATA_H
-
+#pragma once
 #include <QObject>
 #include <QTimer>
 #include <QPointF>
 
-const int MAX_POINT_COUNT = 20;
+const int MAX_POINT_COUNT = 50;
 
 class RandomPointsData : public QObject
 {
@@ -28,5 +26,3 @@ private:
     QTimer update_timer_;
     std::vector<QPointF> pos_list_;
 };
-
-#endif // RANDOMPOINTSDATA_H
