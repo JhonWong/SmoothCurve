@@ -1,5 +1,4 @@
-#ifndef SMOOTHCURVE_H
-#define SMOOTHCURVE_H
+#pragma once
 
 #include <QQuickItem>
 #include <QSGNode>
@@ -16,8 +15,8 @@ private:
     void calculateSmoothPoints();
 
 private:
-    int old_point_count_;
     std::vector<QPointF> smooth_data_list_;
-};
 
-#endif // SMOOTHCURVE_H
+    int last_pos_index_;
+    float last_pre_slope_;
+};

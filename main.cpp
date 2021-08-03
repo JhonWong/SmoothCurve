@@ -2,7 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQuickWindow>
 #include <QQuickView>
-#include "smoothcurve.h"
+#include "smooth_curve.h"
 #include "random_points_view.h"
 
 
