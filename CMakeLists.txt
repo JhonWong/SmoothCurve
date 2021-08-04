@@ -29,6 +29,8 @@ random_points_view.h
 random_points_view.cpp
 smooth_curve.h
 smooth_curve.cpp
+cubic_interp_wrapper.h
+cubic_interp_wrapper.cpp
 spline.h
 )
 

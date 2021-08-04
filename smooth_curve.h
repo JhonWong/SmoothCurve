@@ -13,6 +13,7 @@ public:
 
 private:
     void calculateSmoothPoints();
+    void randomValueInterp(const std::vector<QPointF> pos_list);
 
 private:
     std::vector<QPointF> smooth_data_list_;
