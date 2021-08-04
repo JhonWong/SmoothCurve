@@ -5,6 +5,7 @@
 #include <QTime>
 #include "random_points_data.h"
 #include "spline.h"
+#include "cubic_interp_wrapper.h"
 
 SmoothCurve::SmoothCurve()
     :last_pos_index_(-1)
@@ -103,25 +104,19 @@ void SmoothCurve::calculateSmoothPoints()
         last_pos_index_ = origin_pos_list.size() - 1;
     }
 
-    ////Interpolate between the endpoints of the current interval and the previous interval
-    //if (!smooth_data_list_.empty()) //Is it the first interval
-    //{
-    //    auto pre_start = QPointF(smooth_data_list_[smooth_data_list_.size() - 2]);
-    //    auto start = QPointF(smooth_data_list_.back());
-    //    auto end = current_inter_data.front();
-    //    std::vector<double> x_pos_list = { pre_start.x(),start.x(),end.x() };
-    //    std::vector<double> y_pos_list = { pre_start.y(),start.y(),end.y() };
+    //Interpolate between the endpoints of the current interval and the previous interval
+    if (!smooth_data_list_.empty()) //Is it the first interval
+    {
+        auto start = QPointF(smooth_data_list_.back());
+        auto end = current_inter_data.front();
+        TwoPointInterpolation t_calcualtor(start, end, last_pre_slope_, first_current_slope);
 
-    //    tk::spline s(x_pos_list, y_pos_list, tk::spline::cspline, true,
-    //        tk::spline::first_deriv, last_pre_slope_,
-    //        tk::spline::first_deriv, first_current_slope);
-
-    //    for (float x_pos = start.x() + 1; x_pos < end.x(); x_pos++)
-    //    {
-    //        auto y_pos = s(x_pos);
-    //        smooth_data_list_.push_back(QPointF(x_pos, y_pos));
-    //    }
-    //}
+        for (float x_pos = start.x() + 1; x_pos < end.x(); x_pos++)
+        {
+            auto y_pos = t_calcualtor.get_interp_value(x_pos);
+            smooth_data_list_.push_back(QPointF(x_pos, y_pos));
+        }
+    }
 
     smooth_data_list_.insert(smooth_data_list_.end(), current_inter_data.begin(), current_inter_data.end());
 

@@ -41,8 +41,8 @@ void RandomPointsData::onTimerUpdate()
     for (int i = 0; i < INCREASE_SPEED; i++)
     {
         auto x_pos = current_x_pos;
-        current_x_pos += 50;
-        x_pos = rand() % 800;
+        current_x_pos += 20;
+        //x_pos = rand() % 800;
         int y_pos = rand() % 800;
 
         pos_list_.push_back(QPointF(x_pos, y_pos));
