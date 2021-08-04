@@ -18,6 +18,6 @@ private:
 private:
     std::vector<QPointF> smooth_data_list_;
 
-    int last_pos_index_;
+    int current_pos_index_;
     float last_pre_slope_;
 };

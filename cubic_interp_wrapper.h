@@ -8,9 +8,10 @@
 class TwoPointInterpolation
 {
 public:
-    TwoPointInterpolation(const QPointF start, const QPointF end, const double left_slope, const double right_slope/*,const double left_curvature,const double right_curvature*/);
+    TwoPointInterpolation(const QPointF start, const QPointF end, const double left_slope = 0.0, const double right_slope = 0.0);
 
-    double get_interp_value(const double value) const;
+    double get_interp_value(const double pos) const;
+    double get_slope_value(const double pos) const;
 private:
     void configFunc();
 
@@ -26,7 +27,45 @@ private:
 
     double left_slope_bound_;
     double right_slope_bound_;
+};
 
-    //double left_curvature_bound_;
-    //double right_curvature_bound_;;
+//Interpolate monotonic intervals
+class InterpolationWrapper
+{
+public:
+    InterpolationWrapper(std::vector<QPointF> pos_list, const double left_slope = 0.0, const double right_slope = 0.0, double interp_step = 1.0);
+    ~InterpolationWrapper();
+
+    std::vector<QPointF> getInterpPosList();
+    double get_slope(const double pos) const;
+
+private:
+    void generateCalcualtor();
+
+private:
+    std::vector<QPointF> origin_pos_list_;
+    std::vector<QPointF> interp_pos_list_;
+    double left_slope_;
+    double right_slope_;
+    double step_;
+
+    tk::spline* spline_calculator_;
+    TwoPointInterpolation* two_point_calculator_;
+};
+
+class MonotonicHelper
+{
+public:
+    enum Type
+    {
+        Invalid = -1,
+        Ascending,
+        Descending,
+        YAscending,
+        YDescending,
+    };
+
+    static std::tuple<Type /*origin monotonic*/, std::vector<QPointF>> makeMonotonic(const std::vector<QPointF>& origin_pos_list, const int start_index, int& start_interval, int& end_interval);
+
+    static std::vector<QPointF> reverseMonotonic(std::vector<QPointF> origin_data_list);
 };

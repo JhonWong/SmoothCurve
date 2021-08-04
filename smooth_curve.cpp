@@ -8,7 +8,7 @@
 #include "cubic_interp_wrapper.h"
 
 SmoothCurve::SmoothCurve()
-    :last_pos_index_(-1)
+    :current_pos_index_(-1)
     , last_pre_slope_(0)
 {
     setFlag(ItemHasContents, true);
@@ -59,11 +59,31 @@ QSGNode* SmoothCurve::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* _da
 
 void SmoothCurve::calculateSmoothPoints()
 {
+    const auto& origin_pos_list = RandomPointsData::getInstance().get_pos_list();
+    if (current_pos_index_ >= origin_pos_list.size()) return;
+
     QTime tmp_timer;
     tmp_timer.start();
 
-    const auto& origin_pos_list = RandomPointsData::getInstance().get_pos_list();
+    //interpolate with last curve
+    if (!smooth_data_list_.empty())
+    {
+        std::vector<QPointF> pos_list = { smooth_data_list_.back(),origin_pos_list[current_pos_index_] };
+        int start = 0, end = 0;
+        auto mono_vec = MonotonicHelper::makeMonotonic(pos_list,0,start,end);
 
+        InterpolationWrapper interp_cal(std::get<1>(mono_vec),last_pre_slope_)
+
+
+    }
+
+    while (current_pos_index_ < origin_pos_list.size())
+    {
+
+    }
+
+
+    //================================
     //calculate smooth point in current interval
     double first_current_slope = 0.0;
     double last_current_slope = 0.0;
@@ -83,7 +103,7 @@ void SmoothCurve::calculateSmoothPoints()
         s_calculator.set_points(x_pos_list, y_pos_list);
         s_calculator.make_monotonic();
 
-        for (int i = last_pos_index_ + 1; i < origin_pos_list.size() - 1; i++)
+        for (int i = current_pos_index_ + 1; i < origin_pos_list.size() - 1; i++)
         {
             const auto pos = origin_pos_list[i];
             current_inter_data.push_back(pos);
@@ -101,7 +121,7 @@ void SmoothCurve::calculateSmoothPoints()
         first_current_slope = s_calculator.deriv(1, current_inter_data.front().x());
         last_current_slope = s_calculator.deriv(1, current_inter_data.back().x());
 
-        last_pos_index_ = origin_pos_list.size() - 1;
+        current_pos_index_ = origin_pos_list.size() - 1;
     }
 
     //Interpolate between the endpoints of the current interval and the previous interval
