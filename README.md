@@ -1,0 +1,3 @@
+- 使用CMake组织代码
+- 需要将当前代码目录名称设置为code
+- 需要将`Qt5Config.cmake`文件所在目录添加至环境变量PATH中
