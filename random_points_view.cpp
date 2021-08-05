@@ -23,7 +23,7 @@ QSGNode *RandomPointsView::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData
     if (!oldNode) {
         node = new QSGGeometryNode;
         geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), MAX_POINT_COUNT);
-        geometry->setLineWidth(10);
+        geometry->setLineWidth(3);
         geometry->setDrawingMode(QSGGeometry::DrawPoints);
         node->setGeometry(geometry);
         node->setFlag(QSGNode::OwnsGeometry);

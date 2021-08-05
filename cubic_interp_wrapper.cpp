@@ -239,8 +239,15 @@ std::tuple<double, double> MonotonicHelper::convertSlope(const double left_slope
 
     if (mono_type & YIndependent)
     {
-        if (tmp_left != 0.0) tmp_left = 1.0 / tmp_left;
-        if (tmp_right != 0.0) tmp_right = 1.0 / tmp_right;
+        if (std::abs(tmp_left) > 1e-5)
+        {
+            tmp_left = 1.0 / tmp_left;
+        }
+
+        if (std::abs(tmp_right) > 1e-5)
+        {
+            tmp_right = 1.0 / tmp_right;
+        }
     }
     
     return std::make_tuple(tmp_left, tmp_right);
@@ -265,7 +272,7 @@ void MonotonicHelper::removeAdjustRepeatPoint(std::vector<QPointF>& pos_list, co
 
 void testMonotonicHelper()
 {
-    srand((unsigned)time(0));
+    //srand((unsigned)time(0));
 
     std::vector<QPointF> pos_list;
     pos_list.push_back(QPointF(44, 0));

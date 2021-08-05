@@ -1,7 +1,7 @@
 #include "random_points_data.h"
 
-const int INCREASE_SPEED = 5;
-const unsigned int UPDATE_INTERVAL = 200;
+const int INCREASE_SPEED = 20;
+const unsigned int UPDATE_INTERVAL = 20;
 
 RandomPointsData& RandomPointsData::getInstance()
 {
@@ -47,5 +47,6 @@ void RandomPointsData::onTimerUpdate()
 
         pos_list_.push_back(QPointF(x_pos, y_pos));
     }
+
     emit sigDataChanged();
 }

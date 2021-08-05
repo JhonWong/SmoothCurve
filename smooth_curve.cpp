@@ -42,8 +42,6 @@ QSGNode* SmoothCurve::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* _da
         geometry->allocate(data_size);
     }
 
-    //auto& point_data_obj = RandomPointsData::getInstance();
-    //const auto& pos_list = point_data_obj.get_pos_list();
     QSGGeometry::Point2D* vertices = geometry->vertexDataAsPoint2D();
     for (int i = 0; i < point_count; i++)
     {
@@ -60,9 +58,6 @@ void SmoothCurve::calculateSmoothPoints()
 {
     const auto& origin_pos_list = RandomPointsData::getInstance().get_pos_list();
     if (current_pos_index_ >= (int)origin_pos_list.size()) return;
-
-    QTime tmp_timer;
-    tmp_timer.start();
 
     auto old_smooth_size = smooth_data_list_.size();
 
@@ -90,14 +85,10 @@ void SmoothCurve::calculateSmoothPoints()
         smooth_data_list_.insert(smooth_data_list_.end(), interp_list.begin(), interp_list.end());
 
         last_pre_slope_ = last_slope;
-        current_pos_index_ += (std::get<1>(mono_vec[i])).size();
     }
+    current_pos_index_ = origin_pos_list.size();
 
-    MonotonicHelper::removeAdjustRepeatPoint(smooth_data_list_, old_smooth_size);
-
-    //print time expend
-    auto sec_expend = tmp_timer.elapsed();
-    qDebug() << "\ttime:" << sec_expend << "ms";
+    //MonotonicHelper::removeAdjustRepeatPoint(smooth_data_list_, old_smooth_size);
 
     this->update();
 }
