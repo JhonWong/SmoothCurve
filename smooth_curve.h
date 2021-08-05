@@ -1,7 +1,8 @@
 #pragma once
-
 #include <QQuickItem>
 #include <QSGNode>
+
+#include "cubic_interp_wrapper.h"
 
 class SmoothCurve : public QQuickItem
 {
@@ -11,9 +12,12 @@ public:
 
     QSGNode* updatePaintNode(QSGNode *old_node, UpdatePaintNodeData *_data) override;
 
-private:
+private slots:
     void calculateSmoothPoints();
-    void randomValueInterp(const std::vector<QPointF> pos_list);
+
+private:
+    //return:origin interpolation list
+    std::vector<QPointF> interpSingleMono(const std::tuple<int,std::vector<QPointF>> mono_inter,const double left_slope_bound,double& slope_last_origin_pos);
 
 private:
     std::vector<QPointF> smooth_data_list_;

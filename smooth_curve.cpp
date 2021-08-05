@@ -5,10 +5,9 @@
 #include <QTime>
 #include "random_points_data.h"
 #include "spline.h"
-#include "cubic_interp_wrapper.h"
 
 SmoothCurve::SmoothCurve()
-    :current_pos_index_(-1)
+    :current_pos_index_(0)
     , last_pre_slope_(0)
 {
     setFlag(ItemHasContents, true);
@@ -60,87 +59,41 @@ QSGNode* SmoothCurve::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* _da
 void SmoothCurve::calculateSmoothPoints()
 {
     const auto& origin_pos_list = RandomPointsData::getInstance().get_pos_list();
-    if (current_pos_index_ >= origin_pos_list.size()) return;
+    if (current_pos_index_ >= (int)origin_pos_list.size()) return;
 
     QTime tmp_timer;
     tmp_timer.start();
 
-    //interpolate with last curve
-    if (!smooth_data_list_.empty())
+    auto old_smooth_size = smooth_data_list_.size();
+
+    //interpolation with last interval
+    if (current_pos_index_ > 0)
     {
-        std::vector<QPointF> pos_list = { smooth_data_list_.back(),origin_pos_list[current_pos_index_] };
-        int start = 0, end = 0;
-        auto mono_vec = MonotonicHelper::makeMonotonic(pos_list,0,start,end);
+        std::vector<QPointF> pos_list = { origin_pos_list[current_pos_index_ - 1],origin_pos_list[current_pos_index_] };
+        auto mono_list_bt = MonotonicHelper::makeMonotonic(pos_list, 0);
 
-        InterpolationWrapper interp_cal(std::get<1>(mono_vec),last_pre_slope_)
+        double last_slope = 0.0;
+        auto interp_list = interpSingleMono(mono_list_bt[0], last_pre_slope_, last_slope);
+        smooth_data_list_.insert(smooth_data_list_.end(), interp_list.begin(), interp_list.end());
 
-
+        last_pre_slope_ = last_slope;
     }
 
-    while (current_pos_index_ < origin_pos_list.size())
+    //interpolation current interval
+    //make vector monotonic
+    auto mono_vec = MonotonicHelper::makeMonotonic(origin_pos_list, current_pos_index_);
+    for (int i = 0; i < mono_vec.size(); i++)
     {
+        double last_slope = 0.0;
+        last_slope = 0.0;
+        auto interp_list = interpSingleMono(mono_vec[i], last_pre_slope_, last_slope);
+        smooth_data_list_.insert(smooth_data_list_.end(), interp_list.begin(), interp_list.end());
 
+        last_pre_slope_ = last_slope;
+        current_pos_index_ += (std::get<1>(mono_vec[i])).size();
     }
 
-
-    //================================
-    //calculate smooth point in current interval
-    double first_current_slope = 0.0;
-    double last_current_slope = 0.0;
-    std::vector<QPointF> current_inter_data;
-    {
-        //set origin data
-        std::vector<double> x_pos_list;
-        std::vector<double> y_pos_list;
-        for (auto pos : origin_pos_list)
-        {
-            x_pos_list.push_back(pos.x());
-            y_pos_list.push_back(pos.y());
-        }
-        tk::spline s_calculator;
-        s_calculator.set_boundary(tk::spline::second_deriv, 0.0,
-            tk::spline::second_deriv, 0.0);
-        s_calculator.set_points(x_pos_list, y_pos_list);
-        s_calculator.make_monotonic();
-
-        for (int i = current_pos_index_ + 1; i < origin_pos_list.size() - 1; i++)
-        {
-            const auto pos = origin_pos_list[i];
-            current_inter_data.push_back(pos);
-
-            const auto next_pos = origin_pos_list[i + 1];
-            //Interpolation interval: 1
-            for (float x_pos = pos.x() + 1; x_pos < next_pos.x(); x_pos++)
-            {
-                auto y_pos = s_calculator(x_pos);
-                current_inter_data.push_back(QPointF(x_pos, y_pos));
-            }
-        }
-        //add last point
-        current_inter_data.push_back(origin_pos_list.back());
-        first_current_slope = s_calculator.deriv(1, current_inter_data.front().x());
-        last_current_slope = s_calculator.deriv(1, current_inter_data.back().x());
-
-        current_pos_index_ = origin_pos_list.size() - 1;
-    }
-
-    //Interpolate between the endpoints of the current interval and the previous interval
-    if (!smooth_data_list_.empty()) //Is it the first interval
-    {
-        auto start = QPointF(smooth_data_list_.back());
-        auto end = current_inter_data.front();
-        TwoPointInterpolation t_calcualtor(start, end, last_pre_slope_, first_current_slope);
-
-        for (float x_pos = start.x() + 1; x_pos < end.x(); x_pos++)
-        {
-            auto y_pos = t_calcualtor.get_interp_value(x_pos);
-            smooth_data_list_.push_back(QPointF(x_pos, y_pos));
-        }
-    }
-
-    smooth_data_list_.insert(smooth_data_list_.end(), current_inter_data.begin(), current_inter_data.end());
-
-    last_pre_slope_ = last_current_slope;
+    MonotonicHelper::removeAdjustRepeatPoint(smooth_data_list_, old_smooth_size);
 
     //print time expend
     auto sec_expend = tmp_timer.elapsed();
@@ -149,7 +102,23 @@ void SmoothCurve::calculateSmoothPoints()
     this->update();
 }
 
-void SmoothCurve::randomValueInterp(const std::vector<QPointF> pos_list)
+std::vector<QPointF> SmoothCurve::interpSingleMono(const std::tuple<int, std::vector<QPointF>> mono_inter, const double left_slope_bound, double& slope_last_origin_pos)
 {
+    auto mono_type = std::get<0>(mono_inter);
+    auto pos_list = std::get<1>(mono_inter);
 
+    auto slope_bound = MonotonicHelper::convertSlope(left_slope_bound, 0.0, mono_type);
+
+    InterpolationWrapper interp(pos_list, std::get<0>(slope_bound), std::get<1>(slope_bound));
+    auto interp_list = interp.getInterpPosList();
+    interp_list = MonotonicHelper::convertMonotonic(interp_list, mono_type);
+
+    auto origin_pos_list = MonotonicHelper::convertMonotonic(pos_list, mono_type);
+    auto last_pos = MonotonicHelper::convertMonotonic({ origin_pos_list.back() }, mono_type);
+
+    auto slope = interp.get_slope(last_pos[0].x());
+    auto new_bound_slope = MonotonicHelper::convertSlope(slope, 0.0, mono_type & 0b10/*Remove ascending descending order*/);
+    slope_last_origin_pos = std::get<0>(new_bound_slope);
+
+    return interp_list;
 }

@@ -4,10 +4,12 @@
 #include <QQuickView>
 #include "smooth_curve.h"
 #include "random_points_view.h"
-
+#include "cubic_interp_wrapper.h"
 
 int main(int argc, char *argv[])
 {
+    //testMonotonicHelper();
+
     QGuiApplication app(argc, argv);
 
     qmlRegisterType<SmoothCurve>("CustomGeometry", 1, 0, "SmoothCurve");

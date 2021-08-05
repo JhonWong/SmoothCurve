@@ -22,7 +22,7 @@ double TwoPointInterpolation::get_interp_value(const double pos) const
 
 double TwoPointInterpolation::get_slope_value(const double pos) const
 {
-    auto ret = 3 * a_*SQUARE(pos) + 2.0*b_*pos + c_;
+    auto ret = 3 * a_ * SQUARE(pos) + 2.0 * b_ * pos + c_;
     return ret;
 }
 
@@ -96,7 +96,7 @@ std::vector<QPointF> InterpolationWrapper::getInterpPosList()
             }
             else
             {
-                y_pos = two_point_calculator_->get_interp_value(x_pos);
+                y_pos = (*spline_calculator_)(x_pos);
             }
 
             interp_pos_list_.push_back(QPointF(x_pos, y_pos));
@@ -135,4 +135,172 @@ void InterpolationWrapper::generateCalcualtor()
 
         spline_calculator_ = new tk::spline(x_pos_list, y_pos_list, tk::spline::cspline, false, tk::spline::bd_type::first_deriv, left_slope_, tk::spline::bd_type::first_deriv, right_slope_);
     }
+}
+
+std::vector<std::tuple<int, std::vector<QPointF>>> MonotonicHelper::makeMonotonic(const std::vector<QPointF>& origin_pos_list, const int start_index)
+{
+    assert(origin_pos_list.size() > 1);
+
+    std::vector<QPointF> target_pos_list(origin_pos_list.begin() + start_index, origin_pos_list.end());
+    removeAdjustRepeatPoint(target_pos_list, 0);
+
+    std::vector<std::tuple<int, std::vector<QPointF>>> mono_list;
+
+    int last_type = None;
+    int interval_start_index = 0;
+    for (int i = 0; i < target_pos_list.size() - 1; i++)
+    {
+        auto current_type = twoPointMonoType(target_pos_list[i], target_pos_list[i + 1]);
+        assert(current_type != None);
+        if (last_type == None) last_type = current_type;
+
+        if (current_type != last_type)
+        {
+            assert(i > interval_start_index);
+
+            std::vector<QPointF> current_list(target_pos_list.begin() + interval_start_index, target_pos_list.begin() + i + 1);
+            current_list = convertMonotonic(current_list, last_type);
+            mono_list.push_back(std::make_tuple(last_type, current_list));
+
+            interval_start_index = i;
+        }
+
+        last_type = current_type;
+    }
+
+    //push last interval
+    std::vector<QPointF> current_list(target_pos_list.begin() + interval_start_index, target_pos_list.end());
+    current_list = convertMonotonic(current_list, last_type);
+    mono_list.push_back(std::make_tuple(last_type, current_list));
+
+    return mono_list;
+}
+
+int MonotonicHelper::twoPointMonoType(const QPointF start, const QPointF end)
+{
+    if (start.x() < end.x())
+    {
+        return 0;
+    }
+    else if (start.x() > end.x())
+    {
+        return Descending;
+    }
+    else
+    {
+        if (start.y() < end.y())
+        {
+            return YIndependent;
+        }
+        else if (start.y() > end.y())
+        {
+            return YIndependent | Descending;
+        }
+    }
+
+    return None;
+}
+
+std::vector<QPointF> MonotonicHelper::convertMonotonic(const std::vector<QPointF>& origin_data_list, const int mono_type)
+{
+    std::vector<QPointF> convert_vec = origin_data_list;
+
+    if (mono_type & Descending)
+    {
+        for (int i = 0; i < origin_data_list.size() / 2; i++)
+        {
+            std::swap(convert_vec[i], convert_vec[origin_data_list.size() - i - 1]);
+        }
+    }
+
+    if (mono_type & YIndependent)
+    {
+        for (int i = 0; i < convert_vec.size(); i++)
+        {
+            auto tmp_value = convert_vec[i];
+            convert_vec[i].setX(tmp_value.y());
+            convert_vec[i].setY(tmp_value.x());
+        }
+    }
+
+    return convert_vec;
+}
+
+std::tuple<double, double> MonotonicHelper::convertSlope(const double left_slope, const double right_slope, const int mono_type)
+{
+    auto tmp_left = left_slope;
+    auto tmp_right = right_slope;
+
+    //left right convert
+    if (mono_type & Descending)
+    {
+        std::swap(tmp_left, tmp_right);
+    }
+
+    if (mono_type & YIndependent)
+    {
+        if (tmp_left != 0.0) tmp_left = 1.0 / tmp_left;
+        if (tmp_right != 0.0) tmp_right = 1.0 / tmp_right;
+    }
+    
+    return std::make_tuple(tmp_left, tmp_right);
+}
+
+void MonotonicHelper::removeAdjustRepeatPoint(std::vector<QPointF>& pos_list, const int begin_index)
+{
+    const double repeat_precision = 0.1;
+    for (int i = 0; i < pos_list.size() - 1; i++)
+    {
+        auto current_pos = pos_list[i];
+        auto next_pos = pos_list[i + 1];
+
+        if (std::abs(current_pos.x() - next_pos.x()) < repeat_precision
+            && std::abs(current_pos.y() - next_pos.y()) < repeat_precision)
+        {
+            pos_list.erase(pos_list.begin() + i);
+            i--;
+        }
+    }
+}
+
+void testMonotonicHelper()
+{
+    srand((unsigned)time(0));
+
+    std::vector<QPointF> pos_list;
+    pos_list.push_back(QPointF(44, 0));
+    pos_list.push_back(QPointF(87, 94));
+    pos_list.push_back(QPointF(87, 20));
+    pos_list.push_back(QPointF(46, 93));
+    pos_list.push_back(QPointF(89, 142));
+    pos_list.push_back(QPointF(198, 13));
+    //for (int i = 0; i < 5; i++)
+    //{
+    //    pos_list.push_back(QPointF(rand() % 200, rand() % 200));
+    //}
+
+    auto mono_vec = MonotonicHelper::makeMonotonic(pos_list, 0);
+
+    for (int i = 0; i < mono_vec.size(); i++)
+    {
+        auto type = std::get<0>(mono_vec[i]);
+        auto mono = std::get<1>(mono_vec[i]);
+        auto origin = MonotonicHelper::convertMonotonic(mono, type);
+        auto mono1 = MonotonicHelper::convertMonotonic(origin, type);
+
+        int a = 10;
+        a++;
+    }
+
+    double left_slope = 2.0, right_slope = 0.0;
+    for (int type = 0; type < 7; type++)
+    {
+        auto tmp_slope = MonotonicHelper::convertSlope(left_slope, right_slope, type);
+
+        int a = 10;
+        a++;
+    }
+
+    int a = 10;
+    a++;
 }

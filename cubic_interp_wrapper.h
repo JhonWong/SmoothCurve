@@ -58,14 +58,20 @@ class MonotonicHelper
 public:
     enum Type
     {
-        Invalid = -1,
-        Ascending,
-        Descending,
-        YAscending,
-        YDescending,
+        None = -1,
+        Descending = 1,
+        YIndependent = 2,//Y is the independent variable
     };
 
-    static std::tuple<Type /*origin monotonic*/, std::vector<QPointF>> makeMonotonic(const std::vector<QPointF>& origin_pos_list, const int start_index, int& start_interval, int& end_interval);
+    //Make sure there are at least two points
+    static std::vector<std::tuple<int /*origin monotonic*/, std::vector<QPointF>>> makeMonotonic(const std::vector<QPointF>& origin_pos_list, const int start_index);
+    static int twoPointMonoType(const QPointF start, const QPointF end);
 
-    static std::vector<QPointF> reverseMonotonic(std::vector<QPointF> origin_data_list);
+    static std::vector<QPointF> convertMonotonic(const std::vector<QPointF>& origin_data_list, const int mono_type);
+
+    static std::tuple<double /*left*/, double /*right*/> convertSlope(const double left_slope,const double right_slope, const int mono_type);
+
+    static void removeAdjustRepeatPoint(std::vector<QPointF>& pos_list, const int begin_index);
 };
+
+void testMonotonicHelper();
