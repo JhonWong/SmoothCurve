@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-set(PROJECT "SmoothCurve")
+set(proj_name "SmoothCurve")
 project(SmoothCurve)
 
 string(REGEX REPLACE "/code$" "" PROJECT_OUTPUT_DIR ${PROJECT_SOURCE_DIR})
@@ -20,21 +20,17 @@ endif()
 
 find_package(Qt5 COMPONENTS Core Widgets Gui Qml Quick REQUIRED)
 
-add_executable(${PROJECT}
-main.cpp
-qml.qrc
-random_points_data.h
-random_points_data.cpp
-random_points_view.h
-random_points_view.cpp
-smooth_curve.h
-smooth_curve.cpp
-cubic_interp_wrapper.h
-cubic_interp_wrapper.cpp
-spline.h
-)
+set(RESOURCE_FILES ${PROJECT_SOURCE_DIR}/resource/qml.qrc)
 
-target_link_libraries(${PROJECT}
+include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/app)
+include_directories(${PROJECT_SOURCE_DIR}/bspline_library)
+include_directories(${PROJECT_SOURCE_DIR}/spline)
+include(${PROJECT_SOURCE_DIR}/src.cmake)
+
+add_executable(${proj_name} WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})
+
+target_link_libraries(${proj_name}
     Qt5::Widgets
     Qt5::Qml
     Qt5::Quick
