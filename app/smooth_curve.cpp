@@ -58,7 +58,7 @@ QSGNode* SmoothCurve::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* _da
 void SmoothCurve::calculateSmoothPoints()
 {
     const auto& origin_pos_list = RandomPointsData::getInstance().get_pos_list();
-    if (current_pos_index_ >= (int)origin_pos_list.size()) return;
+    if (current_pos_index_ == ((int)origin_pos_list.size() - 1)) return;
 
     for (int i = current_pos_index_; i < origin_pos_list.size() - 1; i++)
     {
