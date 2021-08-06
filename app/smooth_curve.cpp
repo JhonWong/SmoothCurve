@@ -5,6 +5,7 @@
 #include <QTime>
 #include "random_points_data.h"
 #include "spline.h"
+#include "bezier/bezier.h"
 
 SmoothCurve::SmoothCurve()
     :current_pos_index_(0)
@@ -59,6 +60,17 @@ void SmoothCurve::calculateSmoothPoints()
     const auto& origin_pos_list = RandomPointsData::getInstance().get_pos_list();
     if (current_pos_index_ >= (int)origin_pos_list.size()) return;
 
+    for (int i = current_pos_index_; i < origin_pos_list.size() - 1; i++)
+    {
+        bool topleft = i % 2 == 0;
+        auto interp_pos_list = bezierInterp(origin_pos_list[i], origin_pos_list[i + 1], topleft);
+
+        smooth_data_list_.insert(smooth_data_list_.end(), interp_pos_list.begin(), interp_pos_list.end());
+    }
+    current_pos_index_ = origin_pos_list.size() - 1;
+
+    //=========================================
+/*
     auto old_smooth_size = smooth_data_list_.size();
 
     //interpolation with last interval
@@ -87,7 +99,7 @@ void SmoothCurve::calculateSmoothPoints()
     }
     current_pos_index_ = origin_pos_list.size();
 
-    //MonotonicHelper::removeAdjustRepeatPoint(smooth_data_list_, old_smooth_size);
+    //MonotonicHelper::removeAdjustRepeatPoint(smooth_data_list_, old_smooth_size);*/
 
     this->update();
 }
@@ -111,4 +123,48 @@ std::vector<QPointF> SmoothCurve::interpSingleMono(const std::tuple<int, std::ve
     slope_last_origin_pos = std::get<0>(new_bound_slope);
 
     return interp_list;
+}
+
+const double CONTROL_POINT_DISS = 100;
+std::vector<QPointF> SmoothCurve::bezierInterp(const QPointF start, const QPointF end, const bool topleft)
+{
+    std::vector<Bezier::Vec2> pos_list;
+    pos_list.push_back({ (float)start.x(),(float)start.y() });
+
+    auto p1 = getControlPoint(start, SLOPE_DEFAULT, CONTROL_POINT_DISS, topleft);
+    pos_list.push_back({ (float)p1.x(),(float)p1.y() });
+
+    auto p2 = getControlPoint(end, SLOPE_DEFAULT, CONTROL_POINT_DISS, topleft);
+    pos_list.push_back({ (float)p2.x(),(float)p2.y() });
+
+    pos_list.push_back({ (float)end.x(),(float)end.y() });
+
+    Bezier::Bezier<3> cubicBezier(pos_list);
+    std::vector<QPointF> interp_list;
+
+    auto distance = std::floor(std::abs(end.x() - start.x()));
+    for (int i = 0; i < distance; i++)
+    {
+        auto t = i * (1.0 / distance);
+        auto pos = cubicBezier.valueAt(t);
+        interp_list.push_back(QPointF(pos.x, pos.y));
+    }
+    interp_list.push_back(end);
+
+    return interp_list;
+}
+
+QPointF SmoothCurve::getControlPoint(QPointF another_pos, const double k, const double distance, const double topleft)
+{
+    auto b = another_pos.y() - k * another_pos.x();
+    auto x_dis = std::sqrt((std::pow(distance, 2) / (1 + k)));
+    if (!topleft)
+    {
+        x_dis = -x_dis;
+    }
+
+    auto x_pos = another_pos.x() + x_dis;
+    auto y_pos = k * x_pos + b;
+
+    return QPointF(x_pos, y_pos);
 }

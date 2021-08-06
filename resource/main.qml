@@ -2,8 +2,8 @@ import QtQuick 2.0
 import CustomGeometry 1.0
 
 Item {
-    width: 800
-    height: 800
+    width: 1920
+    height: 1080
 
     RandomPointsView {
         id: point_list

@@ -22,10 +22,13 @@ find_package(Qt5 COMPONENTS Core Widgets Gui Qml Quick REQUIRED)
 
 set(RESOURCE_FILES ${PROJECT_SOURCE_DIR}/resource/qml.qrc)
 
-include_directories(${PROJECT_SOURCE_DIR})
-include_directories(${PROJECT_SOURCE_DIR}/app)
-include_directories(${PROJECT_SOURCE_DIR}/bspline_library)
-include_directories(${PROJECT_SOURCE_DIR}/spline)
+include_directories(${PROJECT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/app
+    ${PROJECT_SOURCE_DIR}/bspline_library
+    ${PROJECT_SOURCE_DIR}/spline
+    ${PROJECT_SOURCE_DIR}/bezier
+)
+
 include(${PROJECT_SOURCE_DIR}/src.cmake)
 
 add_executable(${proj_name} WIN32 ${SOURCE_FILES} ${RESOURCE_FILES})

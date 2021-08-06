@@ -4,13 +4,12 @@
 #include <QPointF>
 
 #define SQUARE(x) std::pow((x),2)
-const double SLOPE_DEFAULT = 0.5;
-const double CURVATRE_DEFAULT = 0.5;
+const double SLOPE_DEFAULT = 1;
 
-class TwoPointInterpolation
+class TwoPointCubicInterpolation
 {
 public:
-    TwoPointInterpolation(const QPointF start, const QPointF end, const double left_slope = SLOPE_DEFAULT, const double right_slope = SLOPE_DEFAULT);
+    TwoPointCubicInterpolation(const QPointF start, const QPointF end, const double left_slope = SLOPE_DEFAULT, const double right_slope = SLOPE_DEFAULT);
 
     double get_interp_value(const double pos) const;
     double get_slope_value(const double pos) const;
@@ -52,7 +51,7 @@ private:
     double step_;
 
     tk::spline* spline_calculator_;
-    TwoPointInterpolation* two_point_calculator_;
+    TwoPointCubicInterpolation* two_point_calculator_;
 };
 
 class MonotonicHelper

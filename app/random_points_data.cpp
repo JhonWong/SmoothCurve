@@ -29,7 +29,6 @@ std::vector<QPointF>& RandomPointsData::get_pos_list()
     return pos_list_;
 }
 
-int current_x_pos = 0;
 void RandomPointsData::onTimerUpdate()
 {
     if (pos_list_.size() >= MAX_POINT_COUNT)
@@ -38,21 +37,13 @@ void RandomPointsData::onTimerUpdate()
         return;
     }
 
-    //for (int i = 0; i < INCREASE_SPEED; i++)
-    //{
-    //    auto x_pos = current_x_pos;
-    //    current_x_pos += 20;
-    //    x_pos = rand() % 800;
-    //    int y_pos = rand() % 800;
+    for (int i = 0; i < INCREASE_SPEED; i++)
+    {
+        int x_pos = rand() % 1920;
+        int y_pos = rand() % 1080;
 
-    //    pos_list_.push_back(QPointF(x_pos, y_pos));
-    //}
-    pos_list_.push_back(QPointF(44, 0));
-    pos_list_.push_back(QPointF(87, 94));
-    //pos_list_.push_back(QPointF(87, 20));
-    pos_list_.push_back(QPointF(46, 93));
-    pos_list_.push_back(QPointF(89, 142));
-    pos_list_.push_back(QPointF(198, 13));
+        pos_list_.push_back(QPointF(x_pos, y_pos));
+    }
 
     emit sigDataChanged();
 }

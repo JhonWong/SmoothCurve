@@ -1,6 +1,6 @@
 #include "cubic_interp_wrapper.h"
 
-TwoPointInterpolation::TwoPointInterpolation(const QPointF start, const QPointF end, const double left_slope, const double right_slope)
+TwoPointCubicInterpolation::TwoPointCubicInterpolation(const QPointF start, const QPointF end, const double left_slope, const double right_slope)
     :left_slope_bound_(0.0)
     , right_slope_bound_(0.0)
 {
@@ -14,19 +14,19 @@ TwoPointInterpolation::TwoPointInterpolation(const QPointF start, const QPointF 
     configFunc();
 }
 
-double TwoPointInterpolation::get_interp_value(const double pos) const
+double TwoPointCubicInterpolation::get_interp_value(const double pos) const
 {
     auto ret = a_ * std::pow(pos, 3) + b_ * SQUARE(pos) + c_ * pos + d_;
     return ret;
 }
 
-double TwoPointInterpolation::get_slope_value(const double pos) const
+double TwoPointCubicInterpolation::get_slope_value(const double pos) const
 {
     auto ret = 3 * a_ * SQUARE(pos) + 2.0 * b_ * pos + c_;
     return ret;
 }
 
-void TwoPointInterpolation::configFunc()
+void TwoPointCubicInterpolation::configFunc()
 {
     const double x1 = start_.x();
     const double y1 = start_.y();
@@ -121,7 +121,7 @@ void InterpolationWrapper::generateCalcualtor()
 {
     if (origin_pos_list_.size() == 2)
     {
-        two_point_calculator_ = new TwoPointInterpolation(origin_pos_list_[0], origin_pos_list_[1], left_slope_, right_slope_);
+        two_point_calculator_ = new TwoPointCubicInterpolation(origin_pos_list_[0], origin_pos_list_[1], left_slope_, right_slope_);
     }
     else
     {

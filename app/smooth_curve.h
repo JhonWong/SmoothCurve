@@ -19,6 +19,9 @@ private:
     //return:origin interpolation list
     std::vector<QPointF> interpSingleMono(const std::tuple<int,std::vector<QPointF>> mono_inter,const double left_slope_bound,double& slope_last_origin_pos);
 
+    std::vector<QPointF> bezierInterp(const QPointF start,const QPointF end,const bool topleft = true);
+    QPointF getControlPoint(QPointF another_pos, const double slope,const double distance,const double topleft);
+
 private:
     std::vector<QPointF> smooth_data_list_;
 
