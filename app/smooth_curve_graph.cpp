@@ -1,4 +1,4 @@
-#include "smooth_curve.h"
+#include "smooth_curve_graph.h"
 #include <QSGGeometry>
 #include <QSGGeometryNode>
 #include <QSGFlatColorMaterial>
@@ -6,10 +6,12 @@
 #include "random_points_data.h"
 #include "spline.h"
 #include "bezier/bezier.h"
+#include "shader_point_node.h"
 
 SmoothCurve::SmoothCurve()
     :current_pos_index_(0)
     , last_pre_slope_(SLOPE_DEFAULT)
+    , point_node_(nullptr)
 {
     setFlag(ItemHasContents, true);
 
@@ -22,6 +24,7 @@ QSGNode* SmoothCurve::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* _da
     QSGGeometryNode* node = nullptr;
     QSGGeometry* geometry = nullptr;
 
+    //curve node
     const int point_count = smooth_data_list_.size();
     unsigned int data_size = std::max(point_count, 1);
     if (!oldNode) {
@@ -51,6 +54,15 @@ QSGNode* SmoothCurve::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* _da
     }
 
     node->markDirty(QSGNode::DirtyGeometry);
+
+    //point node
+    if (!point_node_)
+    {
+        point_node_ = new CustomPointNode(10, QColor(Qt::red));
+        node->appendChildNode(point_node_);
+    }
+    auto& origin_data_list = RandomPointsData::getInstance().get_pos_list();
+    point_node_->updateGeomety(origin_data_list);
 
     return node;
 }

@@ -5,11 +5,11 @@ Item {
     width: 1920
     height: 1080
 
-    RandomPointsView {
-        id: point_list
-        anchors.fill: parent
-        anchors.margins: 20
-    }
+    //RandomPointsView {
+    //    id: point_list
+    //    anchors.fill: parent
+    //    anchors.margins: 20
+    //}
 
     SmoothCurve {
         id: line_smooth

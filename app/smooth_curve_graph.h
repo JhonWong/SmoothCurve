@@ -4,6 +4,8 @@
 
 #include "cubic_interp_wrapper.h"
 
+class CustomPointNode;
+
 class SmoothCurve : public QQuickItem
 {
     Q_OBJECT
@@ -27,4 +29,6 @@ private:
 
     int current_pos_index_;
     float last_pre_slope_;
+
+    CustomPointNode *point_node_;
 };
