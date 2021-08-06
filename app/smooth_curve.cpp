@@ -8,7 +8,7 @@
 
 SmoothCurve::SmoothCurve()
     :current_pos_index_(0)
-    , last_pre_slope_(0)
+    , last_pre_slope_(SLOPE_DEFAULT)
 {
     setFlag(ItemHasContents, true);
 
@@ -67,7 +67,7 @@ void SmoothCurve::calculateSmoothPoints()
         std::vector<QPointF> pos_list = { origin_pos_list[current_pos_index_ - 1],origin_pos_list[current_pos_index_] };
         auto mono_list_bt = MonotonicHelper::makeMonotonic(pos_list, 0);
 
-        double last_slope = 0.0;
+        double last_slope = SLOPE_DEFAULT;
         auto interp_list = interpSingleMono(mono_list_bt[0], last_pre_slope_, last_slope);
         smooth_data_list_.insert(smooth_data_list_.end(), interp_list.begin(), interp_list.end());
 
@@ -79,8 +79,7 @@ void SmoothCurve::calculateSmoothPoints()
     auto mono_vec = MonotonicHelper::makeMonotonic(origin_pos_list, current_pos_index_);
     for (int i = 0; i < mono_vec.size(); i++)
     {
-        double last_slope = 0.0;
-        last_slope = 0.0;
+        double last_slope = SLOPE_DEFAULT;
         auto interp_list = interpSingleMono(mono_vec[i], last_pre_slope_, last_slope);
         smooth_data_list_.insert(smooth_data_list_.end(), interp_list.begin(), interp_list.end());
 
@@ -98,7 +97,7 @@ std::vector<QPointF> SmoothCurve::interpSingleMono(const std::tuple<int, std::ve
     auto mono_type = std::get<0>(mono_inter);
     auto pos_list = std::get<1>(mono_inter);
 
-    auto slope_bound = MonotonicHelper::convertSlope(left_slope_bound, 0.0, mono_type);
+    auto slope_bound = MonotonicHelper::convertSlope(left_slope_bound, SLOPE_DEFAULT, mono_type);
 
     InterpolationWrapper interp(pos_list, std::get<0>(slope_bound), std::get<1>(slope_bound));
     auto interp_list = interp.getInterpPosList();

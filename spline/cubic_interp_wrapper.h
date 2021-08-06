@@ -4,11 +4,13 @@
 #include <QPointF>
 
 #define SQUARE(x) std::pow((x),2)
+const double SLOPE_DEFAULT = 0.5;
+const double CURVATRE_DEFAULT = 0.5;
 
 class TwoPointInterpolation
 {
 public:
-    TwoPointInterpolation(const QPointF start, const QPointF end, const double left_slope = 0.0, const double right_slope = 0.0);
+    TwoPointInterpolation(const QPointF start, const QPointF end, const double left_slope = SLOPE_DEFAULT, const double right_slope = SLOPE_DEFAULT);
 
     double get_interp_value(const double pos) const;
     double get_slope_value(const double pos) const;
@@ -33,7 +35,7 @@ private:
 class InterpolationWrapper
 {
 public:
-    InterpolationWrapper(std::vector<QPointF> pos_list, const double left_slope = 0.0, const double right_slope = 0.0, double interp_step = 1.0);
+    InterpolationWrapper(std::vector<QPointF> pos_list, const double left_slope = SLOPE_DEFAULT, const double right_slope = SLOPE_DEFAULT, double interp_step = 1.0);
     ~InterpolationWrapper();
 
     std::vector<QPointF> getInterpPosList();

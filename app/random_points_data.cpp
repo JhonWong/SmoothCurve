@@ -38,15 +38,21 @@ void RandomPointsData::onTimerUpdate()
         return;
     }
 
-    for (int i = 0; i < INCREASE_SPEED; i++)
-    {
-        auto x_pos = current_x_pos;
-        current_x_pos += 20;
-        x_pos = rand() % 800;
-        int y_pos = rand() % 800;
+    //for (int i = 0; i < INCREASE_SPEED; i++)
+    //{
+    //    auto x_pos = current_x_pos;
+    //    current_x_pos += 20;
+    //    x_pos = rand() % 800;
+    //    int y_pos = rand() % 800;
 
-        pos_list_.push_back(QPointF(x_pos, y_pos));
-    }
+    //    pos_list_.push_back(QPointF(x_pos, y_pos));
+    //}
+    pos_list_.push_back(QPointF(44, 0));
+    pos_list_.push_back(QPointF(87, 94));
+    //pos_list_.push_back(QPointF(87, 20));
+    pos_list_.push_back(QPointF(46, 93));
+    pos_list_.push_back(QPointF(89, 142));
+    pos_list_.push_back(QPointF(198, 13));
 
     emit sigDataChanged();
 }
