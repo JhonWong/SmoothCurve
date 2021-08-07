@@ -5,6 +5,7 @@
 #include "cubic_interp_wrapper.h"
 
 class CustomPointNode;
+class SmoothCurveNode;
 
 class SmoothCurve : public QQuickItem
 {
@@ -15,20 +16,9 @@ public:
     QSGNode* updatePaintNode(QSGNode *old_node, UpdatePaintNodeData *_data) override;
 
 private slots:
-    void calculateSmoothPoints();
+    void pointDataUpdate();
 
 private:
-    //return:origin interpolation list
-    std::vector<QPointF> interpSingleMono(const std::tuple<int,std::vector<QPointF>> mono_inter,const double left_slope_bound,double& slope_last_origin_pos);
-
-    std::vector<QPointF> bezierInterp(const QPointF start,const QPointF end,const bool topleft = true);
-    QPointF getControlPoint(QPointF another_pos, const double slope,const double distance,const double topleft);
-
-private:
-    std::vector<QPointF> smooth_data_list_;
-
-    int current_pos_index_;
-    float last_pre_slope_;
-
     CustomPointNode *point_node_;
+    SmoothCurveNode *curve_node_;
 };

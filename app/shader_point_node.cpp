@@ -72,7 +72,7 @@ CustomPointNode::CustomPointNode(const int size, const QColor color)
     setFlag(OwnsMaterial);
 }
 
-void CustomPointNode::updateGeomety(const std::vector<QPointF>& pos_list)
+void CustomPointNode::updateGeometry(const std::vector<QPointF>& pos_list)
 {
     const int point_count = pos_list.size();
     geometry_.allocate(point_count);

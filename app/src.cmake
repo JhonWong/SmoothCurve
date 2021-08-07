@@ -8,4 +8,6 @@ ${dir}/smooth_curve_graph.h
 ${dir}/smooth_curve_graph.cpp
 ${dir}/shader_point_node.h
 ${dir}/shader_point_node.cpp
+${dir}/smooth_curve_node.h
+${dir}/smooth_curve_node.cpp
 )
