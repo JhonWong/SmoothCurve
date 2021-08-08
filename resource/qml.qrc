@@ -1,5 +1,6 @@
 <RCC>
-    <qresource prefix="/">
-        <file>main.qml</file>
-    </qresource>
+  <qresource prefix="/">
+    <file>Rainbow.jpg</file>
+    <file>main.qml</file>
+  </qresource>
 </RCC>

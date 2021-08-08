@@ -3,7 +3,7 @@
 #include <QTimer>
 #include <QPointF>
 
-const int MAX_POINT_COUNT = 50;
+const int MAX_POINT_COUNT = 6;
 
 class RandomPointsData : public QObject
 {
